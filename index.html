@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prime Game</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f2f4f8;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* PHONE FRAME */
+  .app {
+    width: 100%;
+    max-width: 420px;
+    min-height: 100vh;
+    background: white;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  h1 {
+    font-size: 22px;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  /* CARD */
+  .card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-top: 20px;
+  }
+
+  #number {
+    font-size: 64px;
+    font-weight: bold;
+    margin: 10px 0;
+    transition: transform 0.2s ease;
+  }
+
+  .pop { transform: scale(1.2); }
+
+  #result {
+    font-size: 18px;
+    height: 25px;
+    margin-top: 10px;
+  }
+
+  /* BUTTONS */
+  .buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+  }
+
+  button {
+    flex: 1;
+    padding: 15px;
+    font-size: 18px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+
+  .primeBtn {
+    background: #4a7dff;
+    color: white;
+  }
+
+  .notPrimeBtn {
+    background: #ffb347;
+    color: white;
+  }
+
+  button:active {
+    transform: scale(0.95);
+  }
+
+  /* STATS */
+  .stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    font-size: 14px;
+    color: #444;
+  }
+
+  /* LEADERBOARD */
+  .leaderboard {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 12px;
+    background: #f7f9fc;
+  }
+
+  .lb-item {
+    font-size: 14px;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 10px;
+  }
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <h1>🔢 Prime Game</h1>
+
+  <select id="mode" onchange="resetGame()">
+    <option value="balanced">Balanced</option>
+    <option value="natural">Natural</option>
+    <option value="primes">Prime Only</option>
+    <option value="adaptive">Adaptive</option>
+  </select>
+
+  <div class="card">
+
+    <div id="number">--</div>
+
+    <div class="buttons">
+      <button class="primeBtn" onclick="answer(true)">Prime</button>
+      <button class="notPrimeBtn" onclick="answer(false)">Not Prime</button>
+    </div>
+
+    <div id="result"></div>
+
+  </div>
+
+  <div class="stats">
+    <div>🔥 Streak: <span id="streak">0</span></div>
+    <div>🏆 Best: <span id="best">0</span></div>
+  </div>
+
+  <div class="leaderboard">
+    <b>Leaderboard</b>
+    <div id="lbList"></div>
+  </div>
+
+</div>
+
+<script>
+
+let current = 0;
+let streak = 0;
+let best = 0;
+let leaderboard = JSON.parse(localStorage.getItem("lb")) || [];
+let adaptiveLevel = 1;
+
+function isPrime(n) {
+  if (n < 2) return false;
+  for (let i = 2; i <= Math.sqrt(n); i++) {
+    if (n % i === 0) return false;
+  }
+  return true;
+}
+
+/* GENERATION */
+function generate() {
+  const mode = document.getElementById("mode").value;
+
+  if (mode === "balanced") {
+    current = Math.random() < 0.5 ? randPrime() : randNonPrime();
+  }
+  else if (mode === "natural") {
+    current = Math.floor(Math.random() * 150) + 1;
+  }
+  else if (mode === "primes") {
+    current = randPrime();
+  }
+  else {
+    const max = Math.min(50 + adaptiveLevel * 20, 150);
+    current = Math.floor(Math.random() * max) + 1;
+  }
+
+  document.getElementById("number").textContent = current;
+  pop();
+}
+
+function randPrime() {
+  let arr = [];
+  for (let i = 2; i <= 150; i++) {
+    if (isPrime(i)) arr.push(i);
+  }
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function randNonPrime() {
+  let n;
+  do {
+    n = Math.floor(Math.random() * 150) + 1;
+  } while (isPrime(n));
+  return n;
+}
+
+/* GAME */
+function answer(userGuess) {
+  const actual = isPrime(current);
+
+  if (userGuess === actual) {
+    streak++;
+    document.getElementById("result").textContent = "✅ Correct!";
+  } else {
+    saveScore();
+    streak = 0;
+    document.getElementById("result").textContent = "❌ Wrong!";
+  }
+
+  if (streak > best) best = streak;
+
+  if (document.getElementById("mode").value === "adaptive") {
+    adaptiveLevel++;
+  }
+
+  update();
+  setTimeout(generate, 600);
+}
+
+/* LEADERBOARD */
+function saveScore() {
+  leaderboard.push(streak);
+  leaderboard.sort((a,b)=>b-a);
+  leaderboard = leaderboard.slice(0,5);
+  localStorage.setItem("lb", JSON.stringify(leaderboard));
+  renderLB();
+}
+
+function renderLB() {
+  const el = document.getElementById("lbList");
+  el.innerHTML = "";
+
+  leaderboard.forEach((s,i)=>{
+    const div = document.createElement("div");
+    div.className = "lb-item";
+    div.textContent = `${i+1}. ${s}`;
+    el.appendChild(div);
+  });
+}
+
+/* UI */
+function update() {
+  document.getElementById("streak").textContent = streak;
+  document.getElementById("best").textContent = best;
+}
+
+function pop() {
+  const el = document.getElementById("number");
+  el.classList.add("pop");
+  setTimeout(()=>el.classList.remove("pop"),200);
+}
+
+function resetGame() {
+  streak = 0;
+  adaptiveLevel = 1;
+  update();
+  generate();
+}
+
+renderLB();
+generate();
+
+</script>
+
+</body>
+</html>
