@@ -3,117 +3,130 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prime Game</title>
+<title>Prime Trainer</title>
 
 <style>
   body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f2f4f8;
+    font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    background: #eef2f7;
     display: flex;
     justify-content: center;
   }
 
-  /* PHONE FRAME */
   .app {
     width: 100%;
-    max-width: 420px;
+    max-width: 430px;
     min-height: 100vh;
     background: white;
-    box-shadow: 0 0 20px rgba(0,0,0,0.1);
-    padding: 20px;
+    padding: 18px;
     box-sizing: border-box;
   }
 
   h1 {
-    font-size: 22px;
     text-align: center;
+    font-size: 22px;
+    margin: 10px 0;
+  }
+
+  select {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+    border-radius: 10px;
     margin-bottom: 10px;
   }
 
-  /* CARD */
   .card {
-    background: #ffffff;
-    border-radius: 16px;
+    background: white;
+    border-radius: 18px;
     padding: 25px;
     text-align: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    margin-top: 20px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    margin-top: 10px;
   }
 
   #number {
-    font-size: 64px;
-    font-weight: bold;
-    margin: 10px 0;
-    transition: transform 0.2s ease;
+    font-size: 72px;
+    font-weight: 700;
+    transition: transform 0.15s ease;
   }
 
   .pop { transform: scale(1.2); }
 
-  #result {
-    font-size: 18px;
-    height: 25px;
-    margin-top: 10px;
+  #timer {
+    font-size: 16px;
+    margin-top: 6px;
+    color: #555;
   }
 
-  /* BUTTONS */
+  .warning { color: #d93025; font-weight: bold; }
+
   .buttons {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     margin-top: 15px;
   }
 
   button {
     flex: 1;
-    padding: 15px;
+    padding: 16px;
     font-size: 18px;
     border: none;
-    border-radius: 12px;
-    cursor: pointer;
+    border-radius: 14px;
+    font-weight: 600;
   }
 
   .primeBtn {
-    background: #4a7dff;
+    background: #2563eb;
     color: white;
   }
 
   .notPrimeBtn {
-    background: #ffb347;
+    background: #f59e0b;
     color: white;
   }
 
   button:active {
-    transform: scale(0.95);
+    transform: scale(0.96);
   }
 
-  /* STATS */
+  #result {
+    font-size: 18px;
+    margin-top: 10px;
+    height: 24px;
+  }
+
   .stats {
     display: flex;
     justify-content: space-between;
-    margin-top: 15px;
     font-size: 14px;
+    margin-top: 10px;
     color: #444;
   }
 
-  /* LEADERBOARD */
-  .leaderboard {
-    margin-top: 20px;
-    padding: 15px;
-    border-radius: 12px;
+  .panel {
+    margin-top: 14px;
     background: #f7f9fc;
+    padding: 12px;
+    border-radius: 14px;
   }
 
-  .lb-item {
-    font-size: 14px;
-    padding: 5px 0;
-    border-bottom: 1px solid #eee;
+  .item {
+    font-size: 13px;
+    padding: 6px 0;
+    border-bottom: 1px solid #e8e8e8;
   }
 
-  select {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    border-radius: 10px;
+  .prime { color: #1d4ed8; font-weight: 600; }
+  .not-prime { color: #d97706; font-weight: 600; }
+
+  .factor {
+    color: #111;
+    font-size: 12px;
+    margin-top: 2px;
+    display: block;
+    opacity: 0.75;
   }
 
 </style>
@@ -123,37 +136,43 @@
 
 <div class="app">
 
-  <h1>🔢 Prime Game</h1>
+<h1>🔢 Prime Trainer</h1>
 
-  <select id="mode" onchange="resetGame()">
-    <option value="balanced">Balanced</option>
-    <option value="natural">Natural</option>
-    <option value="primes">Prime Only</option>
-    <option value="adaptive">Adaptive</option>
-  </select>
+<select id="mode" onchange="resetGame()">
+  <option value="balanced">Balanced Mode</option>
+  <option value="natural">Natural Distribution</option>
+  <option value="primes">Prime Training</option>
+  <option value="adaptive">Adaptive Difficulty</option>
+</select>
 
-  <div class="card">
+<div class="card">
 
-    <div id="number">--</div>
+  <div id="number">--</div>
+  <div id="timer">Time: 5</div>
 
-    <div class="buttons">
-      <button class="primeBtn" onclick="answer(true)">Prime</button>
-      <button class="notPrimeBtn" onclick="answer(false)">Not Prime</button>
-    </div>
-
-    <div id="result"></div>
-
+  <div class="buttons">
+    <button class="primeBtn" onclick="answer(true)">Prime</button>
+    <button class="notPrimeBtn" onclick="answer(false)">Not Prime</button>
   </div>
 
-  <div class="stats">
-    <div>🔥 Streak: <span id="streak">0</span></div>
-    <div>🏆 Best: <span id="best">0</span></div>
-  </div>
+  <div id="result"></div>
 
-  <div class="leaderboard">
-    <b>Leaderboard</b>
-    <div id="lbList"></div>
-  </div>
+</div>
+
+<div class="stats">
+  <div>🔥 Streak: <span id="streak">0</span></div>
+  <div>🏆 Best: <span id="best">0</span></div>
+</div>
+
+<div class="panel">
+  <b>📜 Learning History</b>
+  <div id="history"></div>
+</div>
+
+<div class="panel">
+  <b>🥇 Leaderboard</b>
+  <div id="lb"></div>
+</div>
 
 </div>
 
@@ -162,8 +181,11 @@
 let current = 0;
 let streak = 0;
 let best = 0;
+let timer;
+let time = 5;
+let adaptive = 1;
+
 let leaderboard = JSON.parse(localStorage.getItem("lb")) || [];
-let adaptiveLevel = 1;
 
 function isPrime(n) {
   if (n < 2) return false;
@@ -171,6 +193,22 @@ function isPrime(n) {
     if (n % i === 0) return false;
   }
   return true;
+}
+
+/* FACTORIZATION */
+function factorize(n) {
+  let res = [];
+  let x = n;
+
+  for (let i = 2; i <= Math.sqrt(x); i++) {
+    while (x % i === 0) {
+      res.push(i);
+      x /= i;
+    }
+  }
+
+  if (x > 1) res.push(x);
+  return res;
 }
 
 /* GENERATION */
@@ -187,14 +225,16 @@ function generate() {
     current = randPrime();
   }
   else {
-    const max = Math.min(50 + adaptiveLevel * 20, 150);
+    const max = Math.min(50 + adaptive * 20, 150);
     current = Math.floor(Math.random() * max) + 1;
   }
 
   document.getElementById("number").textContent = current;
   pop();
+  startTimer();
 }
 
+/* RANDOM */
 function randPrime() {
   let arr = [];
   for (let i = 2; i <= 150; i++) {
@@ -213,9 +253,12 @@ function randNonPrime() {
 
 /* GAME */
 function answer(userGuess) {
-  const actual = isPrime(current);
+  clearInterval(timer);
 
-  if (userGuess === actual) {
+  const actual = isPrime(current);
+  const correct = userGuess === actual;
+
+  if (correct) {
     streak++;
     document.getElementById("result").textContent = "✅ Correct!";
   } else {
@@ -227,11 +270,65 @@ function answer(userGuess) {
   if (streak > best) best = streak;
 
   if (document.getElementById("mode").value === "adaptive") {
-    adaptiveLevel++;
+    adaptive++;
   }
 
+  addHistory(actual, correct, userGuess);
   update();
-  setTimeout(generate, 600);
+
+  setTimeout(generate, 650);
+}
+
+/* TIMER */
+function startTimer() {
+  clearInterval(timer);
+  time = 5;
+
+  timer = setInterval(() => {
+    time--;
+    const t = document.getElementById("timer");
+    t.textContent = "Time: " + time;
+
+    t.classList.toggle("warning", time <= 2);
+
+    if (time <= 0) {
+      clearInterval(timer);
+      streak = 0;
+      document.getElementById("result").textContent = "⏱ Time up!";
+      update();
+      setTimeout(generate, 650);
+    }
+  }, 1000);
+}
+
+/* HISTORY */
+function addHistory(actual, correct, userGuess) {
+  const div = document.createElement("div");
+  div.className = "item";
+
+  let factorText = "";
+
+  // ONLY show factorization when player says "Prime" but it's wrong
+  if (userGuess === true && actual === false) {
+    const f = factorize(current);
+    factorText = `<span class="factor">Factors: ${f.join(" × ")}</span>`;
+  }
+
+  div.innerHTML = `
+    <span class="${actual ? "prime" : "not-prime"}">
+      ${current} (${actual ? "Prime" : "Not Prime"})
+    </span>
+    — ${correct ? "Correct" : "Wrong"}
+    ${factorText}
+  `;
+
+  document.getElementById("history").prepend(div);
+
+  if (document.getElementById("history").children.length > 8) {
+    document.getElementById("history").removeChild(
+      document.getElementById("history").lastChild
+    );
+  }
 }
 
 /* LEADERBOARD */
@@ -244,14 +341,14 @@ function saveScore() {
 }
 
 function renderLB() {
-  const el = document.getElementById("lbList");
-  el.innerHTML = "";
+  const lb = document.getElementById("lb");
+  lb.innerHTML = "";
 
   leaderboard.forEach((s,i)=>{
-    const div = document.createElement("div");
-    div.className = "lb-item";
-    div.textContent = `${i+1}. ${s}`;
-    el.appendChild(div);
+    const d = document.createElement("div");
+    d.className = "item";
+    d.textContent = `${i+1}. ${s}`;
+    lb.appendChild(d);
   });
 }
 
@@ -264,12 +361,12 @@ function update() {
 function pop() {
   const el = document.getElementById("number");
   el.classList.add("pop");
-  setTimeout(()=>el.classList.remove("pop"),200);
+  setTimeout(()=>el.classList.remove("pop"),150);
 }
 
 function resetGame() {
   streak = 0;
-  adaptiveLevel = 1;
+  adaptive = 1;
   update();
   generate();
 }
